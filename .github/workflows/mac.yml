@@ -1,4 +1,4 @@
-name: MacOS.
+name: MacOS ARM64
 
 on:
   push:
@@ -38,9 +38,9 @@ on:
 
 jobs:
 
-  macos:
-    name: MacOS
-    runs-on: macos-13
+  macos-arm64:
+    name: MacOS ARM64
+    runs-on: macos-14
 
     strategy:
       matrix:
@@ -65,9 +65,9 @@ jobs:
         run: |
           sudo chown -R `whoami`:admin /usr/local/share
 
-          brew update
-          brew upgrade || true
-          brew install automake meson nasm ninja pkg-config
+          arch -arm64 brew update
+          arch -arm64 brew upgrade || true
+          arch -arm64 brew install automake meson nasm ninja pkg-config
 
           # Disable spotlight.
           sudo mdutil -a -i off
@@ -92,7 +92,7 @@ jobs:
 
       - name: Libraries.
         run: |
-          ./$REPO_NAME/Telegram/build/prepare/mac.sh skip-release silent
+          arch -arm64 ./$REPO_NAME/Telegram/build/prepare/mac.sh skip-release silent
 
       - name: Free up some disk space.
         run: |
@@ -113,7 +113,7 @@ jobs:
             echo "ARTIFACT_NAME=Telegram" >> $GITHUB_ENV
           fi
 
-          ./configure.sh \
+          arch -arm64 ./configure.sh \
           -D CMAKE_C_FLAGS="-Werror" \
           -D CMAKE_CXX_FLAGS="-Werror" \
           -D CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO \
@@ -124,7 +124,7 @@ jobs:
 
           cd ../out
 
-          xcoderun='xcodebuild build -project Telegram.xcodeproj -scheme Telegram -destination "platform=macOS,arch=x86_64" -configuration Debug'
+          xcoderun='xcodebuild build -project Telegram.xcodeproj -scheme Telegram -destination "platform=macOS,arch=arm64" -configuration Debug'
           bash -c "$xcoderun" || bash -c "$xcoderun" || bash -c "$xcoderun"
 
       - name: Move artifact.
